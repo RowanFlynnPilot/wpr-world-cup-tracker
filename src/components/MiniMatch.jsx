@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchSchedule, fetchMatchSummary } from '../api.js'
-import { HERO_TEAM_ID, POLL_MS } from '../config.js'
+import { HERO_TEAM_ID, POLL_MS, TRACKER_PAGE_URL, WPR_BADGE } from '../config.js'
 import {
   featuredMatches, labelRounds, fmtKickoff, fmtDayRelative, awayOf, homeOf,
   broadcastsOf, venueOf, isLive, isDone, competitorsOf,
@@ -12,9 +12,10 @@ import TopPerformer from './TopPerformer.jsx'
 // The sidebar-size tracker: the marquee match (live first, next kickoff
 // otherwise) plus the USMNT's next game when that's a different match — one
 // card when the USMNT is itself live or next. Scoreboard only — no standings
-// call — to keep the per-article footprint at one request a minute. Optional
-// ?link= query param renders a "Full tracker" link (target=_top so it
-// navigates the reader's page, not the iframe).
+// call — to keep the per-article footprint at one request a minute. The whole
+// card is a link to the page hosting the full tracker (TRACKER_PAGE_URL;
+// ?link= overrides), target=_top so it navigates the reader's page, not the
+// iframe.
 export default function MiniMatch() {
   const [events, setEvents] = useState(null)
   const [error, setError] = useState(null)
@@ -49,19 +50,22 @@ export default function MiniMatch() {
   const matches = featuredMatches(events)
   if (matches.length === 0) return null
   const roundOf = labelRounds(events)
-  const link = new URLSearchParams(window.location.search).get('link')
+  const link = new URLSearchParams(window.location.search).get('link') ?? TRACKER_PAGE_URL
 
   return (
-    <div className="mini">
+    <a className="mini" href={link} target="_top" rel="noopener">
       <Band />
       {matches.map((event) => (
         <MiniCard key={event.id} event={event} round={roundOf.get(event.id)} />
       ))}
       <div className="mini-foot">
-        <span>Wausau Pilot &amp; Review</span>
-        {link && <a className="mini-link" href={link} target="_top" rel="noopener">Full tracker →</a>}
+        <span className="mini-brand">
+          <img src={WPR_BADGE} alt="" className="mini-badge" width="192" height="192" />
+          <span className="mini-brand-name">Wausau Pilot &amp; Review</span>
+        </span>
+        <span className="mini-link">Full tracker →</span>
       </div>
-    </div>
+    </a>
   )
 }
 

@@ -118,9 +118,10 @@ inside an article, a Custom HTML block:
 </script>
 ```
 
-Optional: add `?link=<article url>` to the iframe src and the card shows a
-"Full tracker →" link that navigates the reader to the page hosting the full
-widget, e.g. `.../mini.html?link=https://wausaupilotandreview.com/world-cup/`.
+The whole card is a link: clicking anywhere navigates the reader to the page
+hosting the full tracker (`TRACKER_PAGE_URL` in `src/config.js`, currently
+https://wausaupilotandreview.com/world-cup-2026/). Add `?link=<url>` to the
+iframe src to point a specific embed somewhere else.
 
 ## Sponsor slots
 

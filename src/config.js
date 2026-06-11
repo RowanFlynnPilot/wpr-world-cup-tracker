@@ -42,11 +42,17 @@ export const LEADERS_POLL_MS = 300_000
 // How many names per leaders category.
 export const LEADERS_PER_CATEGORY = 5
 
-// WPR brand assets (the publication's own logo). Vendored into the bundle —
-// same 640×82 wordmark the site masthead serves, but not hotlinked, so a WP
+// WPR brand assets (the publication's own logo and circular badge). Vendored
+// into the bundle — same files the site serves, but not hotlinked, so a WP
 // media-library change can't break the widget.
 import wprLogo from './assets/wpr-logo.png'
+import wprBadge from './assets/wpr-badge.png'
 export const WPR_LOGO = wprLogo
+export const WPR_BADGE = wprBadge
+
+// Where the mini sends readers: the WPR page hosting the full tracker.
+// A ?link= query param on the mini's URL overrides this.
+export const TRACKER_PAGE_URL = 'https://wausaupilotandreview.com/world-cup-2026/'
 export const WPR_TAGLINE = 'Where Locals Look First For News'
 
 // Sellable sponsor surfaces: one masthead slot plus two inline. A slot renders
