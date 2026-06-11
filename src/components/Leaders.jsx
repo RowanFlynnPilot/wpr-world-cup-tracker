@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchLeaders, hydrateAthletes, LEADERS_PER_CATEGORY } from '../api.js'
-import { SPONSORS } from '../config.js'
+import { LEADERS_POLL_MS, SPONSORS } from '../config.js'
 
 // Tournament leaders: the Golden Boot race plus the boards a soccer reader
 // actually argues about. The leaders document 404s until the first match has
@@ -16,12 +16,20 @@ export default function Leaders({ teamMap }) {
   const [boards, setBoards] = useState(null) // null=loading, 'pending'=no stats yet
   const [error, setError] = useState(null)
 
+  // Loads on mount, then re-polls on the slow leaders cadence. A failed
+  // re-poll keeps the last good boards; only a failed first load surfaces
+  // the error state.
   useEffect(() => {
     let cancelled = false
+    let loaded = false
     async function load() {
       const doc = await fetchLeaders()
       if (doc === null) {
-        if (!cancelled) setBoards('pending')
+        if (!cancelled) {
+          loaded = true
+          setBoards('pending')
+          setError(null)
+        }
         return
       }
       const byName = new Map(doc.categories.map((c) => [c.name, c]))
@@ -35,6 +43,8 @@ export default function Leaders({ teamMap }) {
         picked.flatMap((b) => b.leaders.map((l) => l.athlete.$ref)),
       )
       if (cancelled) return
+      loaded = true
+      setError(null)
       setBoards(
         picked.map((b) => ({
           ...b,
@@ -46,8 +56,10 @@ export default function Leaders({ teamMap }) {
         })),
       )
     }
-    load().catch((err) => { if (!cancelled) setError(err.message) })
-    return () => { cancelled = true }
+    const run = () => load().catch((err) => { if (!cancelled && !loaded) setError(err.message) })
+    run()
+    const timer = setInterval(run, LEADERS_POLL_MS)
+    return () => { cancelled = true; clearInterval(timer) }
   }, [])
 
   return (

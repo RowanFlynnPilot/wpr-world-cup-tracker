@@ -34,6 +34,11 @@ export const TZ_LABEL = 'CT'
 // Live polling. One scoreboard GET + one standings GET per minute.
 export const POLL_MS = 60_000
 
+// Leaders re-poll, deliberately slower: the boards move on goals, not on the
+// clock. Also flips the pre-tournament "pending" state after the first whistle
+// without a page reload.
+export const LEADERS_POLL_MS = 300_000
+
 // How many names per leaders category.
 export const LEADERS_PER_CATEGORY = 5
 

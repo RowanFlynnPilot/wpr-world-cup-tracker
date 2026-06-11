@@ -138,7 +138,10 @@ export function pulse(events) {
     (sum, e) => sum + competitorsOf(e).reduce((s, c) => s + Number(c.score ?? 0), 0),
     0,
   )
-  const upcoming = events.filter((e) => !isDone(e))
+  // "Next" means not yet kicked off — matches in play already surface in the
+  // live counter and today's slate, and would otherwise show here with a
+  // stale kickoff time.
+  const upcoming = events.filter((e) => !isDone(e) && !isLive(e))
   const next =
     upcoming.find((e) => competitorsOf(e).some((c) => String(c.team.id) === HERO_TEAM_ID)) ??
     upcoming[0] ??
