@@ -26,6 +26,11 @@ export default function GroupStandings({ groups }) {
 }
 
 function GroupCard({ group }) {
+  // Render by the rank stat, not array order — ESPN usually pre-sorts, but
+  // the rank is the contract.
+  const entries = [...group.standings.entries].sort(
+    (a, b) => statVal(a, 'rank') - statVal(b, 'rank'),
+  )
   return (
     <div className="group-card">
       <h3 className="group-name">{group.name}</h3>
@@ -37,7 +42,7 @@ function GroupCard({ group }) {
           </tr>
         </thead>
         <tbody>
-          {group.standings.entries.map((entry) => {
+          {entries.map((entry) => {
             const rank = statVal(entry, 'rank')
             const cls = rank <= 2 ? 'row-advance' : rank === 3 ? 'row-third' : ''
             return (

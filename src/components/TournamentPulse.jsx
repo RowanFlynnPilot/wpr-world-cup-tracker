@@ -5,11 +5,12 @@ import {
 
 // The thesis strip: where the tournament stands right now, and the next
 // fixture that matters to a Wisconsin reader (the USMNT while they last).
-export default function TournamentPulse({ events, roundOf }) {
+export default function TournamentPulse({ events, roundOf, updatedAt }) {
   const p = pulse(events)
 
   return (
     <section className="pulse" aria-label="Tournament pulse">
+      {updatedAt && <span className="pulse-updated">Updated {fmtKickoff(updatedAt)}</span>}
       <div className="pulse-stats">
         <Stat value={`${p.played}`} label={`of ${TOTAL_MATCHES} matches played`} />
         <Stat value={`${p.goals}`} label="goals scored" />

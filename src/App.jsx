@@ -17,6 +17,9 @@ export default function App() {
   const [groups, setGroups] = useState(null)
   const [error, setError] = useState(null)
   const [selectedId, setSelectedId] = useState(null)
+  // Timestamp of the last successful poll. A failed poll leaves it alone, so
+  // the pulse strip's "Updated" stamp stays honest about data freshness.
+  const [updatedAt, setUpdatedAt] = useState(null)
 
   useEffect(() => {
     let cancelled = false
@@ -26,6 +29,7 @@ export default function App() {
         if (cancelled) return
         setEvents(sched)
         setGroups(standings)
+        setUpdatedAt(new Date().toISOString())
         setError(null)
       } catch (err) {
         if (!cancelled) setError(err.message)
@@ -71,7 +75,7 @@ export default function App() {
   return (
     <div className="page">
       <Masthead />
-      <TournamentPulse events={events} roundOf={roundOf} />
+      <TournamentPulse events={events} roundOf={roundOf} updatedAt={updatedAt} />
       <TodayAtTheCup
         events={events}
         teamMap={teamMap}
