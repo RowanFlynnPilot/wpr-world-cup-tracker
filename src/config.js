@@ -49,10 +49,10 @@ import wprLogo from './assets/wpr-logo.png'
 export const WPR_LOGO = wprLogo
 export const WPR_TAGLINE = 'Where Locals Look First For News'
 
-// Sellable sponsor surfaces. Swap the strings; the layout exposes one header
-// slot plus two inline.
+// Sellable sponsor surfaces: one masthead slot plus two inline. A slot renders
+// only when its string is set — keep it null until the space is actually sold.
 export const SPONSORS = {
-  header: 'Your Sponsor Here',
-  standings: 'Sponsor B',
-  leaders: 'Sponsor C',
+  header: null,
+  standings: null,
+  leaders: null,
 }

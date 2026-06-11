@@ -5,6 +5,7 @@ import {
   fmtDay, fmtKickoff, awayOf, homeOf, broadcastsOf, venueOf, isLive, isDone,
 } from '../lib/derive.js'
 import FormationPitch from './FormationPitch.jsx'
+import Flag from './Flag.jsx'
 
 // Stats shown in the team comparison, in display order. Names match ESPN's
 // boxscore statistics names exactly.
@@ -127,7 +128,7 @@ export default function MatchCenter({ event, roundOf, teamMap, onClose }) {
 function ScoreTeam({ competitor }) {
   return (
     <div className="mc-team">
-      <img src={competitor.team.logo} alt="" className="flag flag-lg" />
+      <Flag team={competitor.team} large />
       <span>{competitor.team.displayName}</span>
     </div>
   )

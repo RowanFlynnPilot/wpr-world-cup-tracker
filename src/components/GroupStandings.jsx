@@ -8,9 +8,11 @@ export default function GroupStandings({ groups }) {
     <section className="groups" aria-label="Group standings">
       <div className="section-head">
         <h2 className="section-title">The twelve groups</h2>
-        <span className="sponsor-inline">
-          <span className="sponsor-eyebrow">Presented by</span> {SPONSORS.standings}
-        </span>
+        {SPONSORS.standings && (
+          <span className="sponsor-inline">
+            <span className="sponsor-eyebrow">Presented by</span> {SPONSORS.standings}
+          </span>
+        )}
       </div>
       <div className="groups-grid">
         {groups.map((group) => (

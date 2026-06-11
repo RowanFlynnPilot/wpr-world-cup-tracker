@@ -66,9 +66,11 @@ export default function Leaders({ teamMap }) {
     <section className="leaders" aria-label="Tournament leaders">
       <div className="section-head">
         <h2 className="section-title">Tournament leaders</h2>
-        <span className="sponsor-inline">
-          <span className="sponsor-eyebrow">Presented by</span> {SPONSORS.leaders}
-        </span>
+        {SPONSORS.leaders && (
+          <span className="sponsor-inline">
+            <span className="sponsor-eyebrow">Presented by</span> {SPONSORS.leaders}
+          </span>
+        )}
       </div>
 
       {error && <p className="mc-empty">Couldn't load leaders: {error}</p>}

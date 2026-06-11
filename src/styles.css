@@ -39,17 +39,19 @@ button { font: inherit; color: inherit; }
 
 /* ---- masthead ---- */
 .masthead { border-bottom: 3px solid var(--ink); padding-bottom: 18px; }
-.masthead-top {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  gap: 16px; flex-wrap: wrap;
+/* Brand centered, newspaper-style; the sponsor slot (when sold) sits top right
+   without disturbing the centering. */
+.masthead-top { position: relative; }
+.masthead-brand {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  text-align: center;
 }
-.masthead-brand { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
 .masthead-logo { height: 54px; width: auto; }
 .masthead-tagline {
   font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--muted);
 }
-.masthead-sponsor { text-align: right; }
+.masthead-sponsor { position: absolute; top: 0; right: 0; text-align: right; }
 .sponsor-eyebrow {
   display: block; font-size: 10px; letter-spacing: 0.12em;
   text-transform: uppercase; color: var(--muted);
@@ -76,6 +78,8 @@ section { margin-top: 40px; }
 
 .flag { width: 20px; height: 14px; object-fit: cover; border: 1px solid var(--rule); }
 .flag-lg { width: 34px; height: 24px; }
+/* Equal-size spacer for unresolved knockout placeholders (see Flag.jsx). */
+.flag-tbd { display: inline-block; visibility: hidden; }
 
 .live-dot {
   display: inline-block; width: 8px; height: 8px; border-radius: 50%;
@@ -254,20 +258,21 @@ button:focus-visible, summary:focus-visible {
 .sched-tv { white-space: nowrap; }
 
 /* ---- groups ---- */
+/* Three cards per row at full width — four reads as a wall of digits. */
 .groups-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
-  gap: 14px; margin-top: 14px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 18px; margin-top: 16px;
 }
-.group-card { border: 1px solid var(--rule); padding: 12px 12px 8px; }
-.group-name { font-family: var(--serif); font-size: 16px; font-weight: 700; margin: 0 0 8px; }
-.group-card table, .thirds-table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+.group-card { border: 1px solid var(--rule); padding: 14px 16px 10px; }
+.group-name { font-family: var(--serif); font-size: 17px; font-weight: 700; margin: 0 0 10px; }
+.group-card table, .thirds-table { border-collapse: collapse; width: 100%; font-size: 13px; }
 .group-card th, .thirds-table th {
   font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--muted); font-weight: 600; text-align: center; padding: 3px 2px;
   border-bottom: 1px solid var(--rule);
 }
 .group-card td, .thirds-table td {
-  text-align: center; padding: 5px 2px; border-bottom: 1px solid var(--wash);
+  text-align: center; padding: 6px 3px; border-bottom: 1px solid var(--wash);
   font-variant-numeric: tabular-nums;
 }
 .t-team { text-align: left !important; }
@@ -318,7 +323,7 @@ td.t-team { display: flex; align-items: center; gap: 6px; white-space: nowrap;
   /* The 640x82 wordmark at a fixed 54px height is 421px wide — wider than a
      phone. Let width drive and the ratio set the height. */
   .masthead-logo { max-width: 100%; height: auto; }
-  .masthead-sponsor { text-align: left; }
+  .masthead-sponsor { position: static; text-align: center; margin-top: 10px; }
   .pulse-stats { gap: 22px; }
   .sched-row { grid-template-columns: 76px auto; }
   .sched-where { grid-column: 1 / -1; text-align: left; padding-left: 4px; }

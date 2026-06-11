@@ -3,6 +3,7 @@ import {
   isLive, isDone, groupOf, todayKey, dayKey, fmtDay,
 } from '../lib/derive.js'
 import { ROUND_SLICES } from '../config.js'
+import Flag from './Flag.jsx'
 
 // The full 104-match browser, sectioned by round, grouped by Central-Time day.
 // Click any row to open the Match Center. The current round opens by default.
@@ -70,13 +71,13 @@ function Row({ event, teamMap, roundOf, selected, onSelect }) {
         {live ? event.status.displayClock : done ? 'FT' : fmtKickoff(event.date)}
       </span>
       <span className="sched-teams">
-        <img src={away.team.logo} alt="" className="flag" loading="lazy" />
+        <Flag team={away.team} />
         <span className="sched-abbr">{away.team.abbreviation}</span>
         <span className="sched-score">
           {live || done ? `${away.score}–${home.score}` : 'v'}
         </span>
         <span className="sched-abbr">{home.team.abbreviation}</span>
-        <img src={home.team.logo} alt="" className="flag" loading="lazy" />
+        <Flag team={home.team} />
       </span>
       <span className="sched-where">
         {group && <span className="group-tag">Grp {group}</span>}

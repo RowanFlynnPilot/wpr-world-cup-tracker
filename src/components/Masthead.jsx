@@ -1,6 +1,7 @@
 import { WPR_LOGO, WPR_TAGLINE, SPONSORS } from '../config.js'
 
-// WPR masthead + the widget's title. One sellable sponsor slot, top right.
+// WPR masthead + the widget's title. Brand centered, newspaper-style. One
+// sellable sponsor slot, top right — hidden until SPONSORS.header is set.
 export default function Masthead() {
   return (
     <header className="masthead">
@@ -9,10 +10,12 @@ export default function Masthead() {
           <img src={WPR_LOGO} alt="Wausau Pilot & Review" className="masthead-logo" width="640" height="82" />
           <span className="masthead-tagline">{WPR_TAGLINE}</span>
         </div>
-        <div className="masthead-sponsor">
-          <span className="sponsor-eyebrow">Presented by</span>
-          <span className="sponsor-name">{SPONSORS.header}</span>
-        </div>
+        {SPONSORS.header && (
+          <div className="masthead-sponsor">
+            <span className="sponsor-eyebrow">Presented by</span>
+            <span className="sponsor-name">{SPONSORS.header}</span>
+          </div>
+        )}
       </div>
       <div className="masthead-title">
         <h1>The 2026 World Cup, by the numbers</h1>

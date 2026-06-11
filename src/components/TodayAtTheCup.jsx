@@ -2,6 +2,7 @@ import {
   currentSlate, fmtKickoff, awayOf, homeOf, broadcastsOf, venueOf,
   isLive, isDone, groupOf,
 } from '../lib/derive.js'
+import Flag from './Flag.jsx'
 
 // The day's slate, broadcast-forward: this is the "where to watch" surface.
 // Clicking a card opens the Match Center.
@@ -71,7 +72,7 @@ function TeamLine({ competitor, showScore }) {
   const so = competitor.shootoutScore
   return (
     <div className="match-card-team">
-      <img src={competitor.team.logo} alt="" className="flag" loading="lazy" />
+      <Flag team={competitor.team} />
       <span className="match-card-name">{competitor.team.displayName}</span>
       {showScore && (
         <span className="match-card-score">
