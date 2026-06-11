@@ -327,6 +327,35 @@ button:focus-visible, summary:focus-visible {
   letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
 }
 
+/* ---- ones to watch (match center + mini): featured player per team ---- */
+.watch { margin-top: 14px; }
+.watch-label {
+  display: block; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); font-weight: 700; margin-bottom: 6px; text-align: center;
+}
+.watch-strip { display: flex; justify-content: center; gap: 22px; }
+.watch-chip { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.watch-face {
+  width: 34px; height: 34px; border-radius: 50%; object-fit: cover;
+  object-position: center top; background: var(--wash);
+  border: 1px solid var(--rule); flex-shrink: 0;
+}
+span.watch-face {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--muted);
+}
+.watch-text { display: flex; flex-direction: column; min-width: 0; }
+.watch-name {
+  font-weight: 600; font-size: 12.5px; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.watch-stat { color: var(--muted); font-size: 11px; }
+/* mini context: tighter, left-aligned, no centered label */
+.mini .watch { margin-top: 10px; }
+.mini .watch-label { text-align: left; }
+.mini .watch-strip { justify-content: flex-start; gap: 14px; }
+.mini .watch-face { width: 28px; height: 28px; }
+
 /* ---- mini embed (mini.html): compact match cards ---- */
 .mini { border: 1px solid var(--rule); padding: 0 18px 12px; background: var(--paper); }
 /* Masthead band: ink field, paper serif, teal underline — full bleed. */

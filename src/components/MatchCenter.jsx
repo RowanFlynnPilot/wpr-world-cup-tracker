@@ -6,6 +6,7 @@ import {
 } from '../lib/derive.js'
 import FormationPitch from './FormationPitch.jsx'
 import Flag from './Flag.jsx'
+import OnesToWatch from './OnesToWatch.jsx'
 
 // Stats shown in the team comparison, in display order. Names match ESPN's
 // boxscore statistics names exactly.
@@ -110,6 +111,8 @@ export default function MatchCenter({ event, roundOf, teamMap, onClose }) {
         {venue && <>{venue.name}{venue.city ? `, ${venue.city}` : ''}</>}
         {tv.length > 0 && <> · Watch on {tv.join(', ')}</>}
       </p>
+
+      <OnesToWatch teams={[away.team, home.team]} />
 
       {error && <p className="mc-empty">Couldn't load match detail: {error}</p>}
       {!summary && !error && <p className="mc-empty">Loading match detail…</p>}

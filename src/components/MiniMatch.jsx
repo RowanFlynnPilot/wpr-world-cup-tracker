@@ -6,6 +6,7 @@ import {
   broadcastsOf, venueOf, isLive, isDone, competitorsOf,
 } from '../lib/derive.js'
 import Flag from './Flag.jsx'
+import OnesToWatch from './OnesToWatch.jsx'
 
 // The sidebar-size tracker: the marquee match (live first, next kickoff
 // otherwise) plus the USMNT's next game when that's a different match — one
@@ -74,6 +75,8 @@ function Band() {
 }
 
 function MiniCard({ event, round }) {
+  const away = awayOf(event)
+  const home = homeOf(event)
   const live = isLive(event)
   const done = isDone(event)
   const hero = competitorsOf(event).some((c) => String(c.team.id) === HERO_TEAM_ID)
@@ -97,8 +100,8 @@ function MiniCard({ event, round }) {
         <span className="mini-round">{round}</span>
       </div>
 
-      <TeamRow competitor={awayOf(event)} showScore={live || done} />
-      <TeamRow competitor={homeOf(event)} showScore={live || done} />
+      <TeamRow competitor={away} showScore={live || done} />
+      <TeamRow competitor={home} showScore={live || done} />
 
       <p className={`mini-when${live ? ' is-live' : ''}`}>
         {live ? event.status.displayClock : done ? 'Full time' : `${fmtKickoff(event.date)} · ${fmtDayRelative(event.date)}`}
@@ -112,6 +115,7 @@ function MiniCard({ event, round }) {
           {tv.map((name) => <span key={name} className="tv-chip">{name}</span>)}
         </div>
       )}
+      <OnesToWatch teams={[away.team, home.team]} />
     </div>
   )
 }

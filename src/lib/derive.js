@@ -155,6 +155,29 @@ export function featuredMatches(events) {
   return hero && hero !== marquee ? [marquee, hero] : [marquee]
 }
 
+// ---- featured players --------------------------------------------------------
+// The honest "star" pick: the team's tournament goals leader, falling back to
+// assists, then saves — only stats actually earned (value > 0). Null until the
+// team has produced one; the per-team leaders doc 404s before a team's first
+// match, same doctrine as the overall boards.
+const FEATURE_CATEGORIES = [
+  ['goals', 'goal'],
+  ['assists', 'assist'],
+  ['saves', 'save'],
+]
+export function featuredFromLeaders(doc) {
+  if (!doc?.categories) return null
+  const byName = new Map(doc.categories.map((c) => [c.name, c]))
+  for (const [name, unit] of FEATURE_CATEGORIES) {
+    const top = byName.get(name)?.leaders?.[0]
+    const value = Number(top?.value ?? top?.displayValue ?? 0)
+    if (top?.athlete?.$ref && value > 0) {
+      return { athleteRef: top.athlete.$ref, value, unit: value === 1 ? unit : `${unit}s` }
+    }
+  }
+  return null
+}
+
 // ---- pulse -----------------------------------------------------------------
 
 export function pulse(events) {

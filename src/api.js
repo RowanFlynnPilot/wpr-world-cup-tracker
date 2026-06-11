@@ -57,6 +57,18 @@ export async function fetchLeaders() {
   return res.json()
 }
 
+// One team's tournament leaders (goals, assists, saves, ...). The document
+// 404s until that team has played its first match — same pre-whistle
+// doctrine as fetchLeaders: null, not an error. Anything else throws.
+export async function fetchTeamLeaders(teamId) {
+  const res = await fetch(
+    `${CORE}/seasons/${SEASON}/types/1/teams/${teamId}/leaders?lang=en&region=us`,
+  )
+  if (res.status === 404) return null
+  if (!res.ok) throw new Error(`ESPN core API ${res.status} for team ${teamId} leaders`)
+  return res.json()
+}
+
 // Leader entries reference athletes by $ref. Hydrate the top N per category
 // in parallel; team identity comes from the team $ref id via the standings
 // team map, costing zero extra requests.

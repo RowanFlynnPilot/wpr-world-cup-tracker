@@ -67,6 +67,10 @@ https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event={i
 Stat leaders (core API — goals, assists, saves, yellowCards, ...; entries are
 $ref links to athlete docs):
 https://sports.core.api.espn.com/v2/sports/soccer/leagues/fifa.world/seasons/2026/types/1/leaders?lang=en&region=us
+
+Per-team leaders (same shape, one team — powers the OnesToWatch featured
+players; shape verified against the completed 2022 season, teams/202):
+https://sports.core.api.espn.com/v2/sports/soccer/leagues/fifa.world/seasons/2026/types/1/teams/{id}/leaders?lang=en&region=us
 ```
 
 Shapes verified against the live 2026 feed and, for completed-match structures
@@ -93,6 +97,11 @@ ARG 3(4)–(2)3 FRA).
   its legend. Don't fake the rest.
 - **Lineups land ~1 hour before kickoff.** Before that, summary rosters have no
   formation/starters; MatchCenter gates the pitch and shows the posting note. Not a bug.
+- **Featured players appear as stats accrue.** Per-team leaders 404 until that
+  team has played; OnesToWatch renders nothing until then (and picks goals →
+  assists → saves, only values > 0). Headshot coverage is thin for smaller
+  nations (Jordan/Uzbekistan: zero) — the monogram circle is the designed
+  fallback, not a missing image.
 - **Stat bars match by `team.id`, not array order.** ESPN's boxscore team order is not
   guaranteed to match the competitors array. Keep it keyed.
 - **Shootout scores** live on `competitor.shootoutScore` and render as `Math.trunc`
