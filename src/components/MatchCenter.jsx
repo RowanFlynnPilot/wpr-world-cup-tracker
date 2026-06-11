@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { fetchMatchSummary } from '../api.js'
+import { POLL_MS } from '../config.js'
 import {
   fmtDay, fmtKickoff, awayOf, homeOf, broadcastsOf, venueOf, isLive, isDone,
 } from '../lib/derive.js'
@@ -31,23 +32,49 @@ const TIMELINE_CHIPS = new Map([
 export default function MatchCenter({ event, roundOf, teamMap, onClose }) {
   const [summary, setSummary] = useState(null)
   const [error, setError] = useState(null)
+  const live = isLive(event)
 
+  // The summary loads once for future and finished matches, and re-polls on
+  // the scoreboard cadence while the match is live so the stats and timeline
+  // keep pace with the polled scoreline. A failed re-poll keeps the last good
+  // summary; only a failed first load surfaces the error state.
   useEffect(() => {
     let cancelled = false
-    fetchMatchSummary(event.id)
-      .then((data) => { if (!cancelled) setSummary(data) })
-      .catch((err) => { if (!cancelled) setError(err.message) })
-    return () => { cancelled = true }
-  }, [event.id])
+    let loaded = false
+    async function load() {
+      try {
+        const data = await fetchMatchSummary(event.id)
+        if (cancelled) return
+        loaded = true
+        setSummary(data)
+        setError(null)
+      } catch (err) {
+        if (!cancelled && !loaded) setError(err.message)
+      }
+    }
+    load()
+    if (!live) return () => { cancelled = true }
+    const timer = setInterval(load, POLL_MS)
+    return () => { cancelled = true; clearInterval(timer) }
+  }, [event.id, live])
+
+  // The panel renders above the schedule, so a click deep in the 104-match
+  // list would otherwise appear to do nothing. App keys this component by
+  // match id, so the mount effect runs once per selection.
+  const sectionRef = useRef(null)
+  useEffect(() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    sectionRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' })
+  }, [])
 
   const home = homeOf(event)
   const away = awayOf(event)
   const venue = venueOf(event)
   const tv = broadcastsOf(event)
-  const started = isLive(event) || isDone(event)
+  const started = live || isDone(event)
 
   return (
-    <section className="match-center" aria-label="Match center">
+    <section ref={sectionRef} className="match-center" aria-label="Match center">
       <div className="mc-head">
         <span className="mc-round">{roundOf.get(event.id)}</span>
         <button className="mc-close" onClick={onClose}>Close</button>
@@ -72,7 +99,7 @@ export default function MatchCenter({ event, roundOf, teamMap, onClose }) {
             <span className="mc-kickoff">{fmtKickoff(event.date)}</span>
           )}
           <span className="mc-status">
-            {isLive(event) ? event.status.displayClock : isDone(event) ? 'Full time' : fmtDay(event.date)}
+            {live ? event.status.displayClock : isDone(event) ? 'Full time' : fmtDay(event.date)}
           </span>
         </div>
         <ScoreTeam competitor={home} />
