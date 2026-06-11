@@ -280,6 +280,11 @@ button:focus-visible, summary:focus-visible {
   text-align: center; padding: 6px 3px; border-bottom: 1px solid var(--wash);
   font-variant-numeric: tabular-nums;
 }
+/* Row hover as a reading aid (same wash as schedule hover). These rows are
+   not clickable — no cursor change, just tracking. */
+.group-card tbody tr:hover td,
+.thirds-table tbody tr:hover td { background: var(--wash); }
+
 .t-team { text-align: left !important; }
 /* Flex lives on an inner span — a display:flex td stops rendering as a table
    cell, which made row borders (the best-thirds cut line) sit unevenly. */
@@ -311,6 +316,7 @@ button:focus-visible, summary:focus-visible {
   display: flex; align-items: center; gap: 8px; padding: 6px 0;
   border-bottom: 1px solid var(--wash); font-size: 13.5px;
 }
+.leader-card li:hover { background: var(--wash); }
 .leader-rank { color: var(--muted); width: 14px; font-size: 12px; }
 .leader-name { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden;
   text-overflow: ellipsis; }
