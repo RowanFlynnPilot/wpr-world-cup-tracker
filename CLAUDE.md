@@ -41,6 +41,9 @@ ESPN soccer APIs → fetch() in browser → React/Vite → GitHub Pages → WP i
   the single `selectedId` for the match center.
 - `src/theme.js` / `src/styles.css` — WPR editorial palette (teal #3A867C accent),
   Fraunces + Public Sans (matches Follow the Money / Brewers design system).
+- `src/main.jsx` — mounts the app; when iframed, posts content height to the
+  parent (`wpr-world-cup-tracker:height`) so the WP embed can resize without an
+  inner scrollbar (listener snippet in docs/HANDOFF.md). Inert when nothing listens.
 
 ## Verified ESPN endpoints (all CORS-open, all hit live during the build)
 

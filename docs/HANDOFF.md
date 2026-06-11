@@ -75,6 +75,27 @@ Paste this to start a session with full context:
 - If the schedule fetch throws "expected 104 events", ESPN changed something —
   investigate the scoreboard response before touching the validation.
 
+## Embedding in WordPress
+
+The widget posts its content height to the parent page
+(`{ type: 'wpr-world-cup-tracker:height', height }`) whenever the layout
+changes. A fixed-height scrolling iframe works without it; to let the page
+grow naturally instead, use this in the WP embed block:
+
+```html
+<iframe id="wpr-wc" src="https://rowanflynnpilot.github.io/wpr-world-cup-tracker/"
+  style="width:100%;border:0;" height="900" title="2026 World Cup tracker"></iframe>
+<script>
+  window.addEventListener('message', function (e) {
+    if (e.origin !== 'https://rowanflynnpilot.github.io') return;
+    if (!e.data || e.data.type !== 'wpr-world-cup-tracker:height') return;
+    document.getElementById('wpr-wc').style.height = e.data.height + 'px';
+  });
+</script>
+```
+
+The origin check means only the deployed widget can resize the frame.
+
 ## Sponsor slots
 
 Three sellable surfaces, strings in `src/config.js` → `SPONSORS`:
