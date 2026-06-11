@@ -130,17 +130,20 @@ export function bestThirds(groups) {
     )
 }
 
-// The one match a compact surface should feature: a live match (the hero
-// team's first), else the next match not yet kicked off (hero first), else —
-// once the tournament is over — the final, as a finished scoreline.
-export function featuredMatch(events) {
+// What a compact surface should feature, in order: the marquee match — live
+// (the hero team's first), else the next kickoff, else, once the tournament
+// is over, the final as a finished scoreline — plus the hero team's live or
+// next match when that's a different game. One entry when the hero team is
+// itself the marquee (or is out).
+export function featuredMatches(events) {
   const heroIn = (e) =>
     competitorsOf(e).some((c) => String(c.team.id) === HERO_TEAM_ID)
   const live = events.filter(isLive)
-  if (live.length > 0) return live.find(heroIn) ?? live[0]
-  const upcoming = events.filter((e) => !isDone(e))
-  if (upcoming.length > 0) return upcoming.find(heroIn) ?? upcoming[0]
-  return events.at(-1) ?? null
+  const upcoming = events.filter((e) => !isDone(e) && !isLive(e))
+  const marquee = live.find(heroIn) ?? live[0] ?? upcoming[0] ?? events.at(-1) ?? null
+  if (!marquee) return []
+  const hero = live.find(heroIn) ?? upcoming.find(heroIn) ?? null
+  return hero && hero !== marquee ? [marquee, hero] : [marquee]
 }
 
 // ---- pulse -----------------------------------------------------------------

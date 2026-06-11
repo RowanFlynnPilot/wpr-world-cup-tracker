@@ -98,16 +98,17 @@ The origin check means only the deployed widget can resize the frame.
 
 ### Mini embed (sidebar / in-article)
 
-`mini.html` is a one-card version: the live match while one is on, otherwise
-the next kickoff. It posts its height under a different message type
-(`wpr-world-cup-tracker:mini-height`), so the full tracker and the mini can
-share a page without resizing each other's iframes. For a sidebar, use a
-Custom HTML widget (Appearance → Widgets); inside an article, a Custom HTML
-block:
+`mini.html` is the compact version: the marquee match (live while one is on,
+otherwise the next kickoff) plus the USMNT's next game when that's a different
+match — one card when the USMNT is itself live or next. It posts its height
+under a different message type (`wpr-world-cup-tracker:mini-height`), so the
+full tracker and the mini can share a page without resizing each other's
+iframes. For a sidebar, use a Custom HTML widget (Appearance → Widgets);
+inside an article, a Custom HTML block:
 
 ```html
 <iframe id="wpr-wc-mini" src="https://rowanflynnpilot.github.io/wpr-world-cup-tracker/mini.html"
-  style="width:100%;border:0;" height="240" title="World Cup — live and next match"></iframe>
+  style="width:100%;border:0;" height="380" title="World Cup — live and next match"></iframe>
 <script>
   window.addEventListener('message', function (e) {
     if (e.origin !== 'https://rowanflynnpilot.github.io') return;

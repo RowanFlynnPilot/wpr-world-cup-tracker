@@ -44,8 +44,9 @@ ESPN soccer APIs → fetch() in browser → React/Vite → GitHub Pages → WP i
 - `src/main.jsx` — mounts the app; when iframed, posts content height to the
   parent (`wpr-world-cup-tracker:height`) so the WP embed can resize without an
   inner scrollbar (listener snippet in docs/HANDOFF.md). Inert when nothing listens.
-- `mini.html` / `src/mini.jsx` — second build entry: a one-card sidebar embed
-  (live match, else next kickoff; `featuredMatch()` in derive.js). Scoreboard
+- `mini.html` / `src/mini.jsx` — second build entry: a sidebar embed with the
+  marquee match (live, else next kickoff) plus the USMNT's next game when
+  that's a different match (`featuredMatches()` in derive.js). Scoreboard
   fetch only, no standings. Posts height as `wpr-world-cup-tracker:mini-height`
   so both embeds can share a page.
 

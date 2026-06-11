@@ -2,16 +2,17 @@ import { useEffect, useState } from 'react'
 import { fetchSchedule } from '../api.js'
 import { HERO_TEAM_ID, POLL_MS } from '../config.js'
 import {
-  featuredMatch, labelRounds, fmtKickoff, fmtDay, awayOf, homeOf,
+  featuredMatches, labelRounds, fmtKickoff, fmtDay, awayOf, homeOf,
   broadcastsOf, venueOf, isLive, isDone, competitorsOf,
 } from '../lib/derive.js'
 import Flag from './Flag.jsx'
 
-// The sidebar-size tracker: one featured match (live first, next kickoff
-// otherwise), polled on the scoreboard cadence. Scoreboard only — no
-// standings call — to keep the per-article footprint at one request a minute.
-// Optional ?link= query param renders a "Full tracker" link (target=_top so
-// it navigates the reader's page, not the iframe).
+// The sidebar-size tracker: the marquee match (live first, next kickoff
+// otherwise) plus the USMNT's next game when that's a different match — one
+// card when the USMNT is itself live or next. Scoreboard only — no standings
+// call — to keep the per-article footprint at one request a minute. Optional
+// ?link= query param renders a "Full tracker" link (target=_top so it
+// navigates the reader's page, not the iframe).
 export default function MiniMatch() {
   const [events, setEvents] = useState(null)
   const [error, setError] = useState(null)
@@ -43,25 +44,38 @@ export default function MiniMatch() {
     return <div className="mini"><p className="mini-note">Loading the Cup…</p></div>
   }
 
-  const event = featuredMatch(events)
-  if (!event) return null
+  const matches = featuredMatches(events)
+  if (matches.length === 0) return null
+  const roundOf = labelRounds(events)
+  const link = new URLSearchParams(window.location.search).get('link')
 
+  return (
+    <div className="mini">
+      <h1 className="mini-title">The 2026 World Cup</h1>
+      {matches.map((event) => (
+        <MiniCard key={event.id} event={event} round={roundOf.get(event.id)} />
+      ))}
+      <div className="mini-foot">
+        <span>Wausau Pilot &amp; Review</span>
+        {link && <a className="mini-link" href={link} target="_top" rel="noopener">Full tracker →</a>}
+      </div>
+    </div>
+  )
+}
+
+function MiniCard({ event, round }) {
   const live = isLive(event)
   const done = isDone(event)
-  const home = homeOf(event)
-  const away = awayOf(event)
-  const venue = venueOf(event)
-  const tv = broadcastsOf(event)
-  const round = labelRounds(events).get(event.id)
-  const link = new URLSearchParams(window.location.search).get('link')
   const hero = competitorsOf(event).some((c) => String(c.team.id) === HERO_TEAM_ID)
   const eyebrow = live
     ? hero ? 'USMNT live' : 'Live at the Cup'
     : done ? 'Final'
     : hero ? 'Next for the USMNT' : 'Next at the Cup'
+  const venue = venueOf(event)
+  const tv = broadcastsOf(event)
 
   return (
-    <div className="mini">
+    <div className="mini-match">
       <div className="mini-head">
         <span className={`mini-eyebrow${live ? ' is-live' : ''}`}>
           {live && <span className="live-dot" aria-hidden="true" />}
@@ -70,10 +84,10 @@ export default function MiniMatch() {
         <span className="mini-round">{round}</span>
       </div>
 
-      <TeamRow competitor={away} showScore={live || done} />
-      <TeamRow competitor={home} showScore={live || done} />
+      <TeamRow competitor={awayOf(event)} showScore={live || done} />
+      <TeamRow competitor={homeOf(event)} showScore={live || done} />
 
-      <p className="mini-when">
+      <p className={`mini-when${live ? ' is-live' : ''}`}>
         {live ? event.status.displayClock : done ? 'Full time' : `${fmtKickoff(event.date)} · ${fmtDay(event.date)}`}
       </p>
       {venue && (
@@ -81,14 +95,10 @@ export default function MiniMatch() {
       )}
       {!done && tv.length > 0 && (
         <div className="mini-tv">
+          <span className="mini-tv-label">Watch</span>
           {tv.map((name) => <span key={name} className="tv-chip">{name}</span>)}
         </div>
       )}
-
-      <div className="mini-foot">
-        <span>Wausau Pilot &amp; Review</span>
-        {link && <a className="mini-link" href={link} target="_top" rel="noopener">Full tracker →</a>}
-      </div>
     </div>
   )
 }
