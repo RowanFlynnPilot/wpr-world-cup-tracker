@@ -27,8 +27,10 @@ export default function BestThirds({ groups }) {
               <td>{i + 1}</td>
               <td>{group}</td>
               <td className="t-team">
-                <img src={entry.team.logos?.[0]?.href} alt="" className="flag" loading="lazy" />
-                {entry.team.shortDisplayName ?? entry.team.displayName}
+                <span className="team-cell">
+                  <img src={entry.team.logos?.[0]?.href} alt="" className="flag" loading="lazy" />
+                  {entry.team.shortDisplayName ?? entry.team.displayName}
+                </span>
               </td>
               <td>{statDisplay(entry, 'gamesPlayed')}</td>
               <td className="t-pts">{statDisplay(entry, 'points')}</td>

@@ -97,8 +97,13 @@ button:focus-visible, summary:focus-visible {
   border-bottom: 1px solid var(--rule); padding: 18px 20px; margin-top: 24px; }
 .pulse-updated { display: block; text-align: right; font-size: 11px;
   letter-spacing: 0.04em; color: var(--muted); margin: -6px 0 8px; }
-.pulse-stats { display: flex; gap: 36px; flex-wrap: wrap; }
-.pulse-stat { display: flex; flex-direction: column; }
+/* Four distinct dials: evenly distributed, centered, hairline-divided. */
+.pulse-stats { display: grid; grid-template-columns: repeat(4, 1fr); }
+.pulse-stat {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; padding: 0 10px;
+}
+.pulse-stat + .pulse-stat { border-left: 1px solid var(--rule); }
 .pulse-value { font-family: var(--serif); font-weight: 700; font-size: 34px; line-height: 1; }
 .pulse-stat.is-live .pulse-value { color: var(--red); }
 .pulse-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
@@ -276,8 +281,10 @@ button:focus-visible, summary:focus-visible {
   font-variant-numeric: tabular-nums;
 }
 .t-team { text-align: left !important; }
-td.t-team { display: flex; align-items: center; gap: 6px; white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis; }
+/* Flex lives on an inner span — a display:flex td stops rendering as a table
+   cell, which made row borders (the best-thirds cut line) sit unevenly. */
+.team-cell { display: flex; align-items: center; gap: 6px; min-width: 0;
+  white-space: nowrap; overflow: hidden; }
 .t-pts { font-weight: 700; }
 .row-advance td:first-child { box-shadow: inset 3px 0 0 var(--teal); }
 .row-third td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
@@ -287,9 +294,10 @@ td.t-team { display: flex; align-items: center; gap: 6px; white-space: nowrap;
 .swatch-gold { background: var(--gold); }
 
 /* ---- best thirds ---- */
-.thirds-table { max-width: 560px; font-size: 13.5px; }
+.thirds-table { max-width: 560px; font-size: 13.5px; margin: 0 auto; }
 .thirds-table td, .thirds-table th { padding: 6px 6px; }
 .thirds-table .cut-line td { border-top: 3px double var(--ink); }
+.thirds .legend { text-align: center; }
 
 /* ---- leaders ---- */
 .leaders-grid {
@@ -324,7 +332,9 @@ td.t-team { display: flex; align-items: center; gap: 6px; white-space: nowrap;
      phone. Let width drive and the ratio set the height. */
   .masthead-logo { max-width: 100%; height: auto; }
   .masthead-sponsor { position: static; text-align: center; margin-top: 10px; }
-  .pulse-stats { gap: 22px; }
+  /* 2x2 on phones; the row-2 leader loses its divider. */
+  .pulse-stats { grid-template-columns: 1fr 1fr; row-gap: 16px; }
+  .pulse-stat:nth-child(3) { border-left: 0; }
   .sched-row { grid-template-columns: 76px auto; }
   .sched-where { grid-column: 1 / -1; text-align: left; padding-left: 4px; }
   .mc-score-num { font-size: 34px; }
