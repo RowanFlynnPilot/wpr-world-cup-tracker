@@ -19,5 +19,12 @@ if (window.parent !== window) {
       { type: 'wpr-world-cup-tracker:height', height: document.documentElement.scrollHeight },
       '*',
     )
+  // ResizeObserver tracks every layout change, but its callbacks ride the
+  // rendering-frame loop, which hidden/background tabs don't run — also post
+  // now, at load, and on a short timer so an embed loaded in a background tab
+  // still sizes to the first data render instead of its fallback height.
   new ResizeObserver(report).observe(document.documentElement)
+  report()
+  window.addEventListener('load', report)
+  for (const ms of [1000, 3000, 8000]) setTimeout(report, ms)
 }
