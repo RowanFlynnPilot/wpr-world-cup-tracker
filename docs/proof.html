@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WPR World Cup — live fetch proof</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Proof file only — the real widget is the React app in this repo.
+     This exists to demonstrate that ESPN's APIs are CORS-open and fetchable
+     straight from a browser with zero infrastructure. Double-click to run. */
+  :root {
+    --ink:#1a1a1a; --paper:#fff; --wash:#f7f5f0; --rule:#e3ddd0;
+    --muted:#6b6b6b; --teal:#3A867C; --gold:#c8a23a; --red:#9b2226;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Public Sans',-apple-system,'Segoe UI',sans-serif; }
+  .wrap { max-width:880px; margin:0 auto; padding:28px 20px 60px; }
+  .mast { text-align:center; border-bottom:3px double var(--ink); padding-bottom:18px; }
+  .mast img { height:52px; }
+  .mast h1 { font-family:'Fraunces',Georgia,serif; font-weight:800; font-size:30px; margin:14px 0 4px; }
+  .mast p { margin:0; color:var(--muted); font-size:13px; }
+  .proof { background:var(--wash); border:1px solid var(--rule); border-left:4px solid var(--teal);
+    padding:12px 16px; margin:20px 0; font-size:13px; line-height:1.5; }
+  h2 { font-family:'Fraunces',Georgia,serif; font-size:20px; border-bottom:1px solid var(--rule);
+    padding-bottom:6px; margin:30px 0 12px; }
+  .match { display:flex; align-items:center; gap:10px; padding:10px 4px;
+    border-bottom:1px solid var(--rule); font-size:14px; }
+  .match img { width:22px; height:22px; object-fit:contain; }
+  .match .teams { flex:1; font-weight:600; }
+  .match .meta { color:var(--muted); font-size:12px; text-align:right; }
+  .tv { display:inline-block; background:var(--ink); color:#fff; font-size:10px;
+    font-weight:700; padding:2px 6px; border-radius:3px; margin-left:4px; letter-spacing:.04em; }
+  .groups { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; }
+  .group { border:1px solid var(--rule); }
+  .group h3 { font-family:'Fraunces',Georgia,serif; font-size:14px; margin:0;
+    padding:8px 10px; background:var(--wash); border-bottom:1px solid var(--rule); }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  td, th { padding:5px 6px; text-align:right; }
+  td:first-child, th:first-child { text-align:left; }
+  th { color:var(--muted); font-weight:600; border-bottom:1px solid var(--rule); }
+  tr:nth-child(-n+2) td:first-child { border-left:3px solid var(--teal); }
+  td img { width:16px; height:16px; vertical-align:-3px; margin-right:5px; }
+  .err { color:var(--red); font-weight:600; }
+  .load { color:var(--muted); font-style:italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="mast">
+    <img src="https://wausaupilotandreview.com/wp-content/uploads/2024/04/WausauPilotandReviewLogo.png" alt="Wausau Pilot &amp; Review">
+    <h1>The 2026 World Cup, by the numbers</h1>
+    <p>Where Locals Look First For News</p>
+  </div>
+
+  <div class="proof">
+    <strong>What this file proves:</strong> ESPN's World Cup APIs are CORS-open and can be
+    fetched directly from any browser — no scraper, no server, no build step. You're looking
+    at live data fetched the moment this page opened. The production widget is the React app
+    in this repo; this is the disposable proof.
+  </div>
+
+  <h2 id="slate-h">Today at the Cup</h2>
+  <div id="slate" class="load">Fetching the slate…</div>
+
+  <h2>Group standings</h2>
+  <div id="groups" class="load">Fetching all 12 groups…</div>
+</div>
+
+<script>
+const SCOREBOARD = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260719&limit=200'
+const STANDINGS = 'https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings?season=2026'
+
+const timeFmt = new Intl.DateTimeFormat('en-US', { hour:'numeric', minute:'2-digit', timeZone:'America/Chicago' })
+const dayFmt = new Intl.DateTimeFormat('en-CA', { year:'numeric', month:'2-digit', day:'2-digit', timeZone:'America/Chicago' })
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))
+
+async function getJSON(url) {
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`ESPN ${res.status} for ${url}`)
+  return res.json()
+}
+
+function renderSlate(events) {
+  const today = dayFmt.format(new Date())
+  let slate = events.filter((e) => dayFmt.format(new Date(e.date)) === today)
+  if (slate.length === 0) {
+    const upcoming = events.filter((e) => !e.status.type.completed)
+    if (upcoming.length === 0) { document.getElementById('slate').textContent = 'Tournament complete.'; return }
+    const nextDay = dayFmt.format(new Date(upcoming[0].date))
+    slate = upcoming.filter((e) => dayFmt.format(new Date(e.date)) === nextDay)
+    document.getElementById('slate-h').textContent = 'Next up at the Cup'
+  }
+  document.getElementById('slate').classList.remove('load')
+  document.getElementById('slate').innerHTML = slate.map((e) => {
+    const comp = e.competitions[0]
+    const away = comp.competitors.find((c) => c.homeAway === 'away')
+    const home = comp.competitors.find((c) => c.homeAway === 'home')
+    const live = e.status.type.state === 'in'
+    const done = e.status.type.completed
+    const score = (live || done) ? `${away.score}–${home.score}` : timeFmt.format(new Date(e.date)) + ' CT'
+    const tv = [...new Set((comp.broadcasts ?? []).flatMap((b) => b.names ?? []))]
+      .map((n) => `<span class="tv">${esc(n)}</span>`).join('')
+    const venue = comp.venue ? `${esc(comp.venue.fullName)}${comp.venue.address?.city ? ', ' + esc(comp.venue.address.city) : ''}` : ''
+    return `<div class="match">
+      <img src="${esc(away.team.logo ?? '')}" alt=""><div class="teams">${esc(away.team.shortDisplayName)} at ${esc(home.team.shortDisplayName)}</div>
+      <div class="meta"><strong>${live ? 'LIVE ' : ''}${esc(score)}</strong>${tv}<br>${venue}</div>
+    </div>`
+  }).join('')
+}
+
+function renderGroups(data) {
+  const stat = (entry, name) => entry.stats.find((s) => s.name === name)?.displayValue ?? '0'
+  document.getElementById('groups').classList.remove('load')
+  document.getElementById('groups').innerHTML = '<div class="groups">' + data.children.map((g) => `
+    <div class="group"><h3>${esc(g.name)}</h3>
+    <table><tr><th>Team</th><th>GP</th><th>GD</th><th>Pts</th></tr>
+    ${g.standings.entries.map((entry) => `<tr>
+      <td><img src="${esc(entry.team.logos?.[0]?.href ?? '')}" alt="">${esc(entry.team.shortDisplayName ?? entry.team.displayName)}</td>
+      <td>${esc(stat(entry, 'gamesPlayed'))}</td><td>${esc(stat(entry, 'pointDifferential'))}</td>
+      <td><strong>${esc(stat(entry, 'points'))}</strong></td></tr>`).join('')}
+    </table></div>`).join('') + '</div>'
+}
+
+getJSON(SCOREBOARD)
+  .then((data) => renderSlate(data.events))
+  .catch((err) => { const el = document.getElementById('slate'); el.className = 'err'; el.textContent = err.message })
+
+getJSON(STANDINGS)
+  .then(renderGroups)
+  .catch((err) => { const el = document.getElementById('groups'); el.className = 'err'; el.textContent = err.message })
+</script>
+</body>
+</html>

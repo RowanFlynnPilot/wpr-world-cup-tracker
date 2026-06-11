@@ -1,0 +1,156 @@
+// Pure functions that shape API responses for the components. No fetching here.
+import { ROUND_SLICES, TZ, TZ_LABEL, HERO_TEAM_ID } from '../config.js'
+
+// ---- time ------------------------------------------------------------------
+
+const timeFmt = new Intl.DateTimeFormat('en-US', {
+  hour: 'numeric', minute: '2-digit', timeZone: TZ,
+})
+const dateFmt = new Intl.DateTimeFormat('en-US', {
+  weekday: 'short', month: 'short', day: 'numeric', timeZone: TZ,
+})
+const dayKeyFmt = new Intl.DateTimeFormat('en-CA', {
+  year: 'numeric', month: '2-digit', day: '2-digit', timeZone: TZ,
+})
+
+export const fmtKickoff = (iso) => `${timeFmt.format(new Date(iso))} ${TZ_LABEL}`
+export const fmtDay = (iso) => dateFmt.format(new Date(iso))
+export const dayKey = (iso) => dayKeyFmt.format(new Date(iso))
+export const todayKey = () => dayKeyFmt.format(new Date())
+
+// ---- schedule --------------------------------------------------------------
+
+// Label every match with its round by chronological sequence. Kickoff
+// timestamps are UTC, so late local kickoffs cross date boundaries — sequence
+// slicing is the one correct path. Input must already be date-sorted
+// (fetchSchedule sorts).
+export function labelRounds(events) {
+  const byId = new Map()
+  let cursor = 0
+  for (const [round, count] of ROUND_SLICES) {
+    for (const event of events.slice(cursor, cursor + count)) {
+      byId.set(event.id, round)
+    }
+    cursor += count
+  }
+  return byId
+}
+
+export const competitorsOf = (event) => event.competitions[0].competitors
+export const homeOf = (event) => competitorsOf(event).find((c) => c.homeAway === 'home')
+export const awayOf = (event) => competitorsOf(event).find((c) => c.homeAway === 'away')
+export const isLive = (event) => event.status.type.state === 'in'
+export const isDone = (event) => event.status.type.completed
+
+export function broadcastsOf(event) {
+  const names = (event.competitions[0].broadcasts ?? []).flatMap((b) => b.names ?? [])
+  return [...new Set(names)]
+}
+
+export function venueOf(event) {
+  const v = event.competitions[0].venue
+  if (!v) return null
+  return { name: v.fullName, city: v.address?.city ?? '' }
+}
+
+// Group matches by Central-Time calendar day, preserving order.
+export function groupByDay(events) {
+  const days = new Map()
+  for (const event of events) {
+    const key = dayKey(event.date)
+    if (!days.has(key)) days.set(key, [])
+    days.get(key).push(event)
+  }
+  return days
+}
+
+// Today's slate, or the next day that has matches once today's are gone.
+export function currentSlate(events) {
+  const today = todayKey()
+  const todays = events.filter((e) => dayKey(e.date) === today)
+  if (todays.length > 0) return { label: 'Today at the Cup', events: todays }
+  const upcoming = events.filter((e) => !isDone(e) && dayKey(e.date) > today)
+  if (upcoming.length === 0) return { label: 'Final whistle', events: [] }
+  const nextDay = dayKey(upcoming[0].date)
+  return {
+    label: `Next up — ${fmtDay(upcoming[0].date)}`,
+    events: upcoming.filter((e) => dayKey(e.date) === nextDay),
+  }
+}
+
+// ---- standings -------------------------------------------------------------
+
+export const statOf = (entry, name) =>
+  entry.stats.find((s) => s.name === name)
+
+export const statVal = (entry, name) => Number(statOf(entry, name)?.value ?? 0)
+export const statDisplay = (entry, name) => statOf(entry, name)?.displayValue ?? '0'
+
+// Team id → identity + group letter, built once from standings. Powers group
+// labels on match rows and team names in the leaders board.
+export function buildTeamMap(groups) {
+  const map = new Map()
+  for (const group of groups) {
+    const letter = group.name.replace('Group ', '')
+    for (const entry of group.standings.entries) {
+      map.set(String(entry.team.id), {
+        name: entry.team.shortDisplayName ?? entry.team.displayName,
+        abbrev: entry.team.abbreviation,
+        logo: entry.team.logos?.[0]?.href,
+        group: letter,
+      })
+    }
+  }
+  return map
+}
+
+export function groupOf(event, teamMap) {
+  for (const c of competitorsOf(event)) {
+    const team = teamMap.get(String(c.team.id))
+    if (team?.group) return team.group
+  }
+  return null
+}
+
+// The eight best third-placed teams advance. Ranked by the published criteria
+// visible in the table: points, then goal difference, then goals for. (FIFA's
+// further tiebreakers — disciplinary points, drawing of lots — are not
+// computable from standings data; see CLAUDE.md.)
+export function bestThirds(groups) {
+  return groups
+    .map((group) => {
+      const entry = group.standings.entries.find((e) => statVal(e, 'rank') === 3)
+      return entry ? { group: group.name.replace('Group ', ''), entry } : null
+    })
+    .filter(Boolean)
+    .sort((a, b) =>
+      statVal(b.entry, 'points') - statVal(a.entry, 'points') ||
+      statVal(b.entry, 'pointDifferential') - statVal(a.entry, 'pointDifferential') ||
+      statVal(b.entry, 'pointsFor') - statVal(a.entry, 'pointsFor'),
+    )
+}
+
+// ---- pulse -----------------------------------------------------------------
+
+export function pulse(events) {
+  const done = events.filter(isDone)
+  const goals = done.reduce(
+    (sum, e) => sum + competitorsOf(e).reduce((s, c) => s + Number(c.score ?? 0), 0),
+    0,
+  )
+  const upcoming = events.filter((e) => !isDone(e))
+  const next =
+    upcoming.find((e) => competitorsOf(e).some((c) => String(c.team.id) === HERO_TEAM_ID)) ??
+    upcoming[0] ??
+    null
+  return {
+    played: done.length,
+    goals,
+    perMatch: done.length > 0 ? (goals / done.length).toFixed(2) : '—',
+    live: events.filter(isLive),
+    next,
+    nextIsHero:
+      next != null &&
+      competitorsOf(next).some((c) => String(c.team.id) === HERO_TEAM_ID),
+  }
+}
