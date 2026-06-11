@@ -13,12 +13,20 @@ export function reportHeight(type) {
       { type, height: document.body.scrollHeight },
       '*',
     )
+  // Trailing debounce: content arriving in bursts (the match center summary,
+  // a dozen images) would otherwise send a flurry of resize messages, each
+  // reflowing the parent page — visible as shaking while it scrolls.
+  let timer = null
+  const queue = () => {
+    clearTimeout(timer)
+    timer = setTimeout(report, 150)
+  }
   // ResizeObserver tracks every layout change, but its callbacks ride the
   // rendering-frame loop, which hidden/background tabs don't run — also post
   // now, at load, and on a short timer so an embed loaded in a background tab
   // still sizes to the first data render instead of its fallback height.
-  new ResizeObserver(report).observe(document.body)
+  new ResizeObserver(queue).observe(document.body)
   report()
-  window.addEventListener('load', report)
-  for (const ms of [1000, 3000, 8000]) setTimeout(report, ms)
+  window.addEventListener('load', queue)
+  for (const ms of [1000, 3000, 8000]) setTimeout(queue, ms)
 }

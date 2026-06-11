@@ -63,11 +63,19 @@ export default function MatchCenter({ event, roundOf, teamMap, onClose }) {
 
   // The panel renders above the schedule, so a click deep in the 104-match
   // list would otherwise appear to do nothing. App keys this component by
-  // match id, so the mount effect runs once per selection.
+  // match id, so the mount effect runs once per selection. Two deliberate
+  // choices: no scroll at all when the panel is already on screen (opening
+  // from a Today card), and an instant jump rather than a smooth animation —
+  // a smooth scroll gets retargeted by the summary growing the panel and,
+  // in the resized iframe embed, fights the parent page's reflow, which
+  // reads as violent shaking.
   const sectionRef = useRef(null)
   useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    sectionRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' })
+    const el = sectionRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    if (rect.top < window.innerHeight && rect.bottom > 0) return
+    el.scrollIntoView({ block: 'nearest' })
   }, [])
 
   const home = homeOf(event)
