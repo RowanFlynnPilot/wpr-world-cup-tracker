@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchSchedule } from '../api.js'
+import { fetchSchedule, fetchMatchSummary } from '../api.js'
 import { HERO_TEAM_ID, POLL_MS } from '../config.js'
 import {
   featuredMatches, labelRounds, fmtKickoff, fmtDayRelative, awayOf, homeOf,
@@ -7,6 +7,7 @@ import {
 } from '../lib/derive.js'
 import Flag from './Flag.jsx'
 import OnesToWatch from './OnesToWatch.jsx'
+import TopPerformer from './TopPerformer.jsx'
 
 // The sidebar-size tracker: the marquee match (live first, next kickoff
 // otherwise) plus the USMNT's next game when that's a different match — one
@@ -115,9 +116,27 @@ function MiniCard({ event, round }) {
           {tv.map((name) => <span key={name} className="tv-chip">{name}</span>)}
         </div>
       )}
+      {done && <DonePerformer eventId={event.id} />}
       <OnesToWatch teams={[away.team, home.team]} />
     </div>
   )
+}
+
+// The mini only shows a completed match once the tournament is over (the
+// final). One cached summary fetch powers its top-performer chip; a failure
+// just leaves the chip off — it's auxiliary content.
+const summaryCache = new Map()
+function DonePerformer({ eventId }) {
+  const [summary, setSummary] = useState(null)
+  useEffect(() => {
+    let cancelled = false
+    if (!summaryCache.has(eventId)) summaryCache.set(eventId, fetchMatchSummary(eventId))
+    summaryCache.get(eventId)
+      .then((data) => { if (!cancelled) setSummary(data) })
+      .catch(() => summaryCache.delete(eventId))
+    return () => { cancelled = true }
+  }, [eventId])
+  return summary ? <TopPerformer summary={summary} /> : null
 }
 
 function TeamRow({ competitor, showScore }) {

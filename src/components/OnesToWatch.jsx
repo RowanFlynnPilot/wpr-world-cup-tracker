@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { fetchTeamLeaders, hydrateAthletes } from '../api.js'
 import { LEADERS_POLL_MS } from '../config.js'
 import { featuredFromLeaders } from '../lib/derive.js'
+import Face from './Face.jsx'
 
 // Each team's featured player: the tournament leading scorer (assists, then
 // saves, as fallbacks — see featuredFromLeaders). Headshot when ESPN has one,
@@ -54,7 +55,7 @@ export default function OnesToWatch({ teams }) {
       <div className="watch-strip">
         {players.map((p, i) => p && (
           <div key={teams[i].id} className="watch-chip">
-            <Face player={p} />
+            <Face name={p.name} headshot={p.headshot} />
             <span className="watch-text">
               <span className="watch-name">{p.name}</span>
               <span className="watch-stat">
@@ -66,12 +67,4 @@ export default function OnesToWatch({ teams }) {
       </div>
     </div>
   )
-}
-
-function Face({ player }) {
-  if (!player.headshot) {
-    const initials = player.name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('')
-    return <span className="watch-face watch-face-blank" aria-hidden="true">{initials}</span>
-  }
-  return <img className="watch-face" src={player.headshot} alt="" loading="lazy" />
 }

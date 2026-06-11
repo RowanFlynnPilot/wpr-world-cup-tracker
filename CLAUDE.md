@@ -102,6 +102,10 @@ ARG 3(4)–(2)3 FRA).
   assists → saves, only values > 0). Headshot coverage is thin for smaller
   nations (Jordan/Uzbekistan: zero) — the monogram circle is the designed
   fallback, not a missing image.
+- **"Top performer" is computed, not official.** ESPN's summary carries no
+  player-of-the-match award, so TopPerformer derives one from the per-player
+  box score (goals → assists → shots on target) and labels it "Top performer",
+  never "Player of the Match".
 - **Stat bars match by `team.id`, not array order.** ESPN's boxscore team order is not
   guaranteed to match the competitors array. Keep it keyed.
 - **Shootout scores** live on `competitor.shootoutScore` and render as `Math.trunc`

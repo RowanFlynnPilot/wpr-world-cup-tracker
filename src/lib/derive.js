@@ -178,6 +178,45 @@ export function featuredFromLeaders(doc) {
   return null
 }
 
+// For a completed match: the top performer, derived from the summary's
+// per-player box score — most goals, then assists, then shots on target.
+// ESPN's feed carries no official player-of-the-match award, so this is
+// computed and labeled as such. Null when nobody registered any of the
+// three (and before the summary has player stats at all).
+export function topPerformer(summary) {
+  const stat = (p, name) => Number(p.stats?.find((s) => s.name === name)?.value ?? 0)
+  let best = null
+  for (const side of summary.rosters ?? []) {
+    for (const p of side.roster ?? []) {
+      const cand = {
+        goals: stat(p, 'totalGoals'),
+        assists: stat(p, 'goalAssists'),
+        sot: stat(p, 'shotsOnTarget'),
+        athlete: p.athlete,
+        team: side.team,
+      }
+      if (cand.goals + cand.assists + cand.sot === 0) continue
+      if (!best ||
+          cand.goals > best.goals ||
+          (cand.goals === best.goals && cand.assists > best.assists) ||
+          (cand.goals === best.goals && cand.assists === best.assists && cand.sot > best.sot)) {
+        best = cand
+      }
+    }
+  }
+  if (!best) return null
+  const parts = []
+  if (best.goals > 0) parts.push(`${best.goals} ${best.goals === 1 ? 'goal' : 'goals'}`)
+  if (best.assists > 0) parts.push(`${best.assists} ${best.assists === 1 ? 'assist' : 'assists'}`)
+  if (parts.length === 0) parts.push(`${best.sot} on target`)
+  return {
+    name: best.athlete?.shortName ?? best.athlete?.displayName ?? '',
+    headshot: best.athlete?.headshot?.href ?? null,
+    teamAbbrev: best.team?.abbreviation ?? '',
+    statLine: parts.join(', '),
+  }
+}
+
 // ---- pulse -----------------------------------------------------------------
 
 export function pulse(events) {

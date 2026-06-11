@@ -7,6 +7,7 @@ import {
 import FormationPitch from './FormationPitch.jsx'
 import Flag from './Flag.jsx'
 import OnesToWatch from './OnesToWatch.jsx'
+import TopPerformer from './TopPerformer.jsx'
 
 // Stats shown in the team comparison, in display order. Names match ESPN's
 // boxscore statistics names exactly.
@@ -119,6 +120,7 @@ export default function MatchCenter({ event, roundOf, teamMap, onClose }) {
 
       {summary && (
         <>
+          {isDone(event) && <TopPerformer summary={summary} />}
           <Formations summary={summary} event={event} />
           <StatBars summary={summary} home={home} away={away} />
           <Timeline summary={summary} home={home} away={away} />
