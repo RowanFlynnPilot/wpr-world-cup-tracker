@@ -327,6 +327,32 @@ button:focus-visible, summary:focus-visible {
   letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
 }
 
+/* ---- mini embed (mini.html): one compact match card ---- */
+.mini { border: 1px solid var(--rule); border-top: 3px solid var(--ink);
+  padding: 14px 16px 12px; background: var(--paper); }
+.mini-note { color: var(--muted); font-size: 12.5px; margin: 4px 0; }
+.mini-head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+  font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.mini-eyebrow { color: var(--teal); font-weight: 700; }
+.mini-eyebrow.is-live { color: var(--red); }
+.mini-round { color: var(--muted); }
+.mini-team { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+.mini-name { flex: 1; font-weight: 600; font-size: 14.5px; }
+.mini-score { font-family: var(--serif); font-weight: 700; font-size: 19px; }
+.mini-when { margin: 9px 0 2px; font-size: 13px; font-weight: 700; }
+.mini-venue { margin: 0; font-size: 11.5px; color: var(--muted); }
+.mini-tv { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 9px; }
+.mini-foot {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+  border-top: 1px solid var(--rule); margin-top: 12px; padding-top: 8px;
+  font-size: 10.5px; letter-spacing: 0.04em; color: var(--muted);
+}
+.mini-link { color: var(--teal); font-weight: 700; text-decoration: none; }
+.mini-link:hover { text-decoration: underline; }
+
 /* ---- footer ---- */
 .footer { border-top: 3px solid var(--ink); margin-top: 48px; padding-top: 16px;
   color: var(--muted); font-size: 12.5px; line-height: 1.6; }

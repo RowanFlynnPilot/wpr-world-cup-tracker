@@ -96,6 +96,31 @@ grow naturally instead, use this in the WP embed block:
 
 The origin check means only the deployed widget can resize the frame.
 
+### Mini embed (sidebar / in-article)
+
+`mini.html` is a one-card version: the live match while one is on, otherwise
+the next kickoff. It posts its height under a different message type
+(`wpr-world-cup-tracker:mini-height`), so the full tracker and the mini can
+share a page without resizing each other's iframes. For a sidebar, use a
+Custom HTML widget (Appearance → Widgets); inside an article, a Custom HTML
+block:
+
+```html
+<iframe id="wpr-wc-mini" src="https://rowanflynnpilot.github.io/wpr-world-cup-tracker/mini.html"
+  style="width:100%;border:0;" height="240" title="World Cup — live and next match"></iframe>
+<script>
+  window.addEventListener('message', function (e) {
+    if (e.origin !== 'https://rowanflynnpilot.github.io') return;
+    if (!e.data || e.data.type !== 'wpr-world-cup-tracker:mini-height') return;
+    document.getElementById('wpr-wc-mini').style.height = e.data.height + 'px';
+  });
+</script>
+```
+
+Optional: add `?link=<article url>` to the iframe src and the card shows a
+"Full tracker →" link that navigates the reader to the page hosting the full
+widget, e.g. `.../mini.html?link=https://wausaupilotandreview.com/world-cup/`.
+
 ## Sponsor slots
 
 Three sellable surfaces, strings in `src/config.js` → `SPONSORS`:

@@ -130,6 +130,19 @@ export function bestThirds(groups) {
     )
 }
 
+// The one match a compact surface should feature: a live match (the hero
+// team's first), else the next match not yet kicked off (hero first), else —
+// once the tournament is over — the final, as a finished scoreline.
+export function featuredMatch(events) {
+  const heroIn = (e) =>
+    competitorsOf(e).some((c) => String(c.team.id) === HERO_TEAM_ID)
+  const live = events.filter(isLive)
+  if (live.length > 0) return live.find(heroIn) ?? live[0]
+  const upcoming = events.filter((e) => !isDone(e))
+  if (upcoming.length > 0) return upcoming.find(heroIn) ?? upcoming[0]
+  return events.at(-1) ?? null
+}
+
 // ---- pulse -----------------------------------------------------------------
 
 export function pulse(events) {
