@@ -328,15 +328,30 @@ button:focus-visible, summary:focus-visible {
 }
 
 /* ---- mini embed (mini.html): compact match cards ---- */
-.mini { border: 1px solid var(--rule); border-top: 3px solid var(--ink);
-  padding: 14px 18px 12px; background: var(--paper); }
-.mini-title {
-  font-family: var(--serif); font-weight: 900; font-size: 19px; line-height: 1.15;
-  margin: 0; padding-bottom: 10px; border-bottom: 1px solid var(--rule);
+.mini { border: 1px solid var(--rule); padding: 0 18px 12px; background: var(--paper); }
+/* Masthead band: ink field, paper serif, teal underline — full bleed. */
+.mini-band {
+  background: var(--ink); margin: 0 -18px; padding: 11px 18px 10px;
+  border-bottom: 3px solid var(--teal);
 }
-.mini-note { color: var(--muted); font-size: 12.5px; margin: 4px 0; }
+.mini-title {
+  font-family: var(--serif); font-weight: 900; font-size: 20px; line-height: 1.15;
+  margin: 0; color: var(--paper);
+}
+.mini-note { color: var(--muted); font-size: 12.5px; margin: 0; padding: 12px 0 4px; }
 .mini-match { padding: 12px 0 14px; }
 .mini-match + .mini-match { border-top: 1px solid var(--rule); }
+/* The live match bleeds a red-tinted band across the card. */
+.mini-match.is-live {
+  background: #faf0f0; margin: 0 -18px; padding-left: 18px; padding-right: 18px;
+  box-shadow: inset 4px 0 0 var(--red);
+}
+/* The hometown match carries the teal rail. */
+.mini-match.is-hero {
+  margin: 0 -18px; padding-left: 18px; padding-right: 18px;
+  box-shadow: inset 4px 0 0 var(--teal);
+}
+.mini-match.is-live .mini-score { font-size: 23px; }
 .mini-head {
   display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
   font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
@@ -346,6 +361,7 @@ button:focus-visible, summary:focus-visible {
 .mini-eyebrow.is-live { color: var(--red); }
 .mini-round { color: var(--muted); }
 .mini-team { display: flex; align-items: center; gap: 9px; padding: 4px 0; }
+.mini-team .flag { width: 24px; height: 16px; }
 .mini-name { flex: 1; font-weight: 600; font-size: 15px; }
 .mini-score { font-family: var(--serif); font-weight: 700; font-size: 20px; line-height: 1; }
 .mini-when {
@@ -359,12 +375,16 @@ button:focus-visible, summary:focus-visible {
   color: var(--muted); margin-right: 3px;
 }
 .mini-foot {
-  display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
   border-top: 1px solid var(--rule); padding-top: 9px;
   font-size: 10.5px; letter-spacing: 0.04em; color: var(--muted);
 }
-.mini-link { color: var(--teal); font-weight: 700; text-decoration: none; }
-.mini-link:hover { text-decoration: underline; }
+.mini-link {
+  background: var(--teal); color: var(--paper); font-weight: 700;
+  text-decoration: none; padding: 5px 11px; font-size: 10.5px;
+  letter-spacing: 0.05em;
+}
+.mini-link:hover { background: #2f6e66; }
 
 /* ---- footer ---- */
 .footer { border-top: 3px solid var(--ink); margin-top: 48px; padding-top: 16px;

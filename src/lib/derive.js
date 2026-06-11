@@ -18,6 +18,15 @@ export const fmtDay = (iso) => dateFmt.format(new Date(iso))
 export const dayKey = (iso) => dayKeyFmt.format(new Date(iso))
 export const todayKey = () => dayKeyFmt.format(new Date())
 
+// "Today" / "Tomorrow" (in Central Time) instead of a calendar date when the
+// match is that close — reads warmer on the compact surfaces.
+export function fmtDayRelative(iso) {
+  const key = dayKey(iso)
+  if (key === todayKey()) return 'Today'
+  if (key === dayKeyFmt.format(new Date(Date.now() + 86_400_000))) return 'Tomorrow'
+  return fmtDay(iso)
+}
+
 // ---- schedule --------------------------------------------------------------
 
 // Label every match with its round by chronological sequence. Kickoff

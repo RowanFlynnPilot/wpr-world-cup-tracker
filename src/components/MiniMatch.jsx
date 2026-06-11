@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { fetchSchedule } from '../api.js'
 import { HERO_TEAM_ID, POLL_MS } from '../config.js'
 import {
-  featuredMatches, labelRounds, fmtKickoff, fmtDay, awayOf, homeOf,
+  featuredMatches, labelRounds, fmtKickoff, fmtDayRelative, awayOf, homeOf,
   broadcastsOf, venueOf, isLive, isDone, competitorsOf,
 } from '../lib/derive.js'
 import Flag from './Flag.jsx'
@@ -38,10 +38,10 @@ export default function MiniMatch() {
   }, [])
 
   if (error && !events) {
-    return <div className="mini"><p className="mini-note">Couldn't reach the tournament feed.</p></div>
+    return <div className="mini"><Band /><p className="mini-note">Couldn't reach the tournament feed.</p></div>
   }
   if (!events) {
-    return <div className="mini"><p className="mini-note">Loading the Cup…</p></div>
+    return <div className="mini"><Band /><p className="mini-note">Loading the Cup…</p></div>
   }
 
   const matches = featuredMatches(events)
@@ -51,7 +51,7 @@ export default function MiniMatch() {
 
   return (
     <div className="mini">
-      <h1 className="mini-title">The 2026 World Cup</h1>
+      <Band />
       {matches.map((event) => (
         <MiniCard key={event.id} event={event} round={roundOf.get(event.id)} />
       ))}
@@ -59,6 +59,16 @@ export default function MiniMatch() {
         <span>Wausau Pilot &amp; Review</span>
         {link && <a className="mini-link" href={link} target="_top" rel="noopener">Full tracker →</a>}
       </div>
+    </div>
+  )
+}
+
+// The masthead band: ink field, paper serif, teal underline — the same
+// section-front language as the publication's chrome.
+function Band() {
+  return (
+    <div className="mini-band">
+      <h1 className="mini-title">The 2026 World Cup</h1>
     </div>
   )
 }
@@ -73,9 +83,12 @@ function MiniCard({ event, round }) {
     : hero ? 'Next for the USMNT' : 'Next at the Cup'
   const venue = venueOf(event)
   const tv = broadcastsOf(event)
+  // Live gets the red bleed band; the hometown match gets the teal rail
+  // (red wins when the USMNT is the live match).
+  const blockCls = `mini-match${live ? ' is-live' : hero ? ' is-hero' : ''}`
 
   return (
-    <div className="mini-match">
+    <div className={blockCls}>
       <div className="mini-head">
         <span className={`mini-eyebrow${live ? ' is-live' : ''}`}>
           {live && <span className="live-dot" aria-hidden="true" />}
@@ -88,7 +101,7 @@ function MiniCard({ event, round }) {
       <TeamRow competitor={homeOf(event)} showScore={live || done} />
 
       <p className={`mini-when${live ? ' is-live' : ''}`}>
-        {live ? event.status.displayClock : done ? 'Full time' : `${fmtKickoff(event.date)} · ${fmtDay(event.date)}`}
+        {live ? event.status.displayClock : done ? 'Full time' : `${fmtKickoff(event.date)} · ${fmtDayRelative(event.date)}`}
       </p>
       {venue && (
         <p className="mini-venue">{venue.name}{venue.city ? `, ${venue.city}` : ''}</p>
