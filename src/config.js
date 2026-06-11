@@ -37,9 +37,11 @@ export const POLL_MS = 60_000
 // How many names per leaders category.
 export const LEADERS_PER_CATEGORY = 5
 
-// WPR brand assets (the publication's own logo).
-export const WPR_LOGO =
-  'https://wausaupilotandreview.com/wp-content/uploads/2024/04/WausauPilotandReviewLogo.png'
+// WPR brand assets (the publication's own logo). Vendored into the bundle —
+// same 640×82 wordmark the site masthead serves, but not hotlinked, so a WP
+// media-library change can't break the widget.
+import wprLogo from './assets/wpr-logo.png'
+export const WPR_LOGO = wprLogo
 export const WPR_TAGLINE = 'Where Locals Look First For News'
 
 // Sellable sponsor surfaces. Swap the strings; the layout exposes one header

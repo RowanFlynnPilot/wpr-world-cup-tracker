@@ -5,7 +5,7 @@ export default function Masthead() {
   return (
     <header className="masthead">
       <div className="masthead-brand">
-        <img src={WPR_LOGO} alt="Wausau Pilot & Review" className="masthead-logo" />
+        <img src={WPR_LOGO} alt="Wausau Pilot & Review" className="masthead-logo" width="640" height="82" />
         <span className="masthead-tagline">{WPR_TAGLINE}</span>
       </div>
       <div className="masthead-sponsor">
