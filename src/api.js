@@ -7,7 +7,7 @@
 //   standings   → 12 groups w/ W/D/L/GF/GA/GD/Pts
 //   summary     → formations + lineups (formationPlace), box score, keyEvents
 //   leaders     → tournament goals/assists/saves/cards (core API, $ref-linked)
-import { SEASON, LEAGUE, DATE_RANGE, LEADERS_PER_CATEGORY } from './config.js'
+import { SEASON, LEAGUE, DATE_RANGE, LEADERS_PER_CATEGORY, TOTAL_MATCHES } from './config.js'
 
 const SITE = `https://site.api.espn.com/apis/site/v2/sports/soccer/${LEAGUE}`
 const SITE_V2 = `https://site.api.espn.com/apis/v2/sports/soccer/${LEAGUE}`
@@ -20,11 +20,14 @@ async function getJSON(url) {
   return res.json()
 }
 
-// Every match in the tournament, opener to final, in one call.
+// Every match in the tournament, opener to final, in one call. Round labels
+// are sliced by sequence (labelRounds), so a short or long feed would mislabel
+// every round downstream — anything other than the full 104 throws.
 export async function fetchSchedule() {
   const data = await getJSON(`${SITE}/scoreboard?dates=${DATE_RANGE}&limit=200`)
-  if (!Array.isArray(data.events) || data.events.length === 0) {
-    throw new Error('Scoreboard returned no events for the tournament window')
+  const count = Array.isArray(data.events) ? data.events.length : 0
+  if (count !== TOTAL_MATCHES) {
+    throw new Error(`Scoreboard returned ${count} events, expected ${TOTAL_MATCHES}`)
   }
   return [...data.events].sort((a, b) => new Date(a.date) - new Date(b.date))
 }
