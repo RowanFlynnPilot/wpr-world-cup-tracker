@@ -123,6 +123,26 @@ hosting the full tracker (`TRACKER_PAGE_URL` in `src/config.js`, currently
 https://wausaupilotandreview.com/world-cup-2026/). Add `?link=<url>` to the
 iframe src to point a specific embed somewhere else.
 
+## Analytics (Plausible)
+
+Both entry points load Plausible at runtime (`src/lib/analytics.js`), reporting
+to the shared `rowanflynnpilot.github.io` dashboard
+(https://plausible.io/rowanflynnpilot.github.io) — the same property as the
+Brewers tracker. No account setup needed; pageviews appear automatically, told
+apart by page path:
+
+- `/wpr-world-cup-tracker/` — full tracker
+- `/wpr-world-cup-tracker/mini.html` — mini embed
+
+Because the widgets are iframed, Plausible records the github.io page with
+`wausaupilotandreview.com` as the referrer. To see referrers/visits scoped to
+one tool, filter the dashboard by Top Pages.
+
+Custom event: the mini fires `Mini → Full tracker` when a reader clicks the
+card through to the World Cup page. To chart it, add it as a Goal in the
+Plausible dashboard (Site Settings → Goals → Custom event) — events still
+record without a goal, but the goal is what surfaces the conversion count.
+
 ## Sponsor slots
 
 Three sellable surfaces, strings in `src/config.js` → `SPONSORS`:

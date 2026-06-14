@@ -5,6 +5,7 @@ import {
   featuredMatches, labelRounds, fmtKickoff, fmtDayRelative, awayOf, homeOf,
   broadcastsOf, venueOf, isLive, isDone, competitorsOf,
 } from '../lib/derive.js'
+import { track } from '../lib/analytics.js'
 import Flag from './Flag.jsx'
 import OnesToWatch from './OnesToWatch.jsx'
 import TopPerformer from './TopPerformer.jsx'
@@ -53,7 +54,13 @@ export default function MiniMatch() {
   const link = new URLSearchParams(window.location.search).get('link') ?? TRACKER_PAGE_URL
 
   return (
-    <a className="mini" href={link} target="_top" rel="noopener">
+    <a
+      className="mini"
+      href={link}
+      target="_top"
+      rel="noopener"
+      onClick={() => track('Mini → Full tracker')}
+    >
       <Band />
       {matches.map((event) => (
         <MiniCard key={event.id} event={event} round={roundOf.get(event.id)} />

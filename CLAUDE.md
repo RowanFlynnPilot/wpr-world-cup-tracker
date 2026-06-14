@@ -37,6 +37,11 @@ ESPN soccer APIs → fetch() in browser → React/Vite → GitHub Pages → WP i
 - `src/config.js` — single source of truth: season, league, date range, round slices,
   hero team, timezone, poll interval, sponsors, brand assets.
 - `src/lib/derive.js` — pure functions shaping API responses. No fetching here.
+- `src/lib/analytics.js` — injects Plausible at runtime (no npm dep, no static
+  tag), data-domain `rowanflynnpilot.github.io` — the shared Pages dashboard,
+  same as wpr-brewers-tracker. Both entry points call `initAnalytics()`; pages
+  are told apart by path. `track(event, props)` fires custom events (the mini
+  fires `Mini → Full tracker` on click-through).
 - `src/components/` — one component per concern. App.jsx owns load + 60s poll +
   the single `selectedId` for the match center.
 - `src/theme.js` / `src/styles.css` — WPR editorial palette (teal #3A867C accent),

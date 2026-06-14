@@ -5,6 +5,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import MiniMatch from './components/MiniMatch.jsx'
 import { reportHeight } from './lib/embed.js'
+import { initAnalytics } from './lib/analytics.js'
 import './styles.css'
 
 createRoot(document.getElementById('root')).render(
@@ -14,3 +15,4 @@ createRoot(document.getElementById('root')).render(
 )
 
 reportHeight('wpr-world-cup-tracker:mini-height')
+initAnalytics()
