@@ -42,6 +42,14 @@ export const LEADERS_POLL_MS = 300_000
 // How many names per leaders category.
 export const LEADERS_PER_CATEGORY = 5
 
+// WPR newsroom coverage. The /wp-json/ REST path is WAF-blocked on the WPR
+// site, but the equivalent ?rest_route= invocation is open AND CORS-enabled
+// (WordPress echoes the request Origin), so the browser fetches it directly —
+// no proxy, ~4 KB. Scoped to the "2026 World Cup" category; verified 2026-06-14.
+export const WPR_API = 'https://wausaupilotandreview.com/?rest_route=/wp/v2/posts'
+export const WPR_WORLDCUP_CATEGORY = 567092152
+export const COVERAGE_COUNT = 5
+
 // WPR brand assets (the publication's own logo and circular badge). Vendored
 // into the bundle — same files the site serves, but not hotlinked, so a WP
 // media-library change can't break the widget.

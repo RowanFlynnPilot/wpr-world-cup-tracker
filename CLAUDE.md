@@ -78,6 +78,23 @@ players; shape verified against the completed 2022 season, teams/202):
 https://sports.core.api.espn.com/v2/sports/soccer/leagues/fifa.world/seasons/2026/types/1/teams/{id}/leaders?lang=en&region=us
 ```
 
+### WPR newsroom coverage (the one non-ESPN source)
+
+The "From the WPR newsroom" section pulls the publication's own World Cup
+articles from the WordPress REST API. Two non-obvious facts, both verified live
+2026-06-14 and easy to mistake for breakage:
+
+- **The `/wp-json/` path is WAF-blocked (403).** So is the REST/category/tag
+  RSS. The site-wide RSS feed is reachable but ~15 MB (1000 items) and sends no
+  CORS header. The **`?rest_route=/wp/v2/posts` invocation is open**, CORS-clean
+  (WordPress echoes the request Origin → `Access-Control-Allow-Origin:
+  <origin>`), and supports `categories`, `per_page`, `_fields`. That is the only
+  viable browser-direct path; do NOT switch to `/wp-json/` or the feed.
+- **Scope by category id, not a search.** `categories=567092152` is the "2026
+  World Cup" category (slug `2026-world-cup`); a `search=world+cup` also matches
+  old "Ryder Cup"/"World Series" posts. Use `date_gmt` (UTC) for the timestamp —
+  the plain `date` field is naive site-local and misparses in the browser.
+
 Shapes verified against the live 2026 feed and, for completed-match structures
 (timeline, shootouts, formations), against the 2022 final (event 633850,
 ARG 3(4)–(2)3 FRA).

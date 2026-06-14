@@ -7,7 +7,10 @@
 //   standings   → 12 groups w/ W/D/L/GF/GA/GD/Pts
 //   summary     → formations + lineups (formationPlace), box score, keyEvents
 //   leaders     → tournament goals/assists/saves/cards (core API, $ref-linked)
-import { SEASON, LEAGUE, DATE_RANGE, LEADERS_PER_CATEGORY, TOTAL_MATCHES } from './config.js'
+import {
+  SEASON, LEAGUE, DATE_RANGE, LEADERS_PER_CATEGORY, TOTAL_MATCHES,
+  WPR_API, WPR_WORLDCUP_CATEGORY, COVERAGE_COUNT,
+} from './config.js'
 
 const SITE = `https://site.api.espn.com/apis/site/v2/sports/soccer/${LEAGUE}`
 const SITE_V2 = `https://site.api.espn.com/apis/v2/sports/soccer/${LEAGUE}`
@@ -66,6 +69,18 @@ export async function fetchTeamLeaders(teamId) {
   )
   if (res.status === 404) return null
   if (!res.ok) throw new Error(`ESPN core API ${res.status} for team ${teamId} leaders`)
+  return res.json()
+}
+
+// Recent WPR World Cup articles, newest first. Uses the ?rest_route= form of
+// the WordPress REST API: the /wp-json/ path is WAF-blocked on the WPR site,
+// but this equivalent invocation is open and CORS-enabled (WP echoes Origin).
+// Category-scoped and field-trimmed to ~4 KB. Auxiliary content — a non-200
+// throws and the Coverage component hides itself rather than erroring the page.
+export async function fetchCoverage() {
+  const url = `${WPR_API}&categories=${WPR_WORLDCUP_CATEGORY}&per_page=${COVERAGE_COUNT}&_fields=date_gmt,link,title.rendered`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`WPR API ${res.status} for coverage`)
   return res.json()
 }
 

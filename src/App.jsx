@@ -10,6 +10,7 @@ import Schedule from './components/Schedule.jsx'
 import GroupStandings from './components/GroupStandings.jsx'
 import BestThirds from './components/BestThirds.jsx'
 import Leaders from './components/Leaders.jsx'
+import Coverage from './components/Coverage.jsx'
 import Footer from './components/Footer.jsx'
 
 export default function App() {
@@ -92,6 +93,7 @@ export default function App() {
           onClose={() => setSelectedId(null)}
         />
       )}
+      <Coverage />
       <Schedule
         events={events}
         teamMap={teamMap}
